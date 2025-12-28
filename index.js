@@ -1,24 +1,15 @@
 const express = require("express");
 
+import { courseRouter } from "./course";
+import { userRouter } from "./user";
+
 const app = express();
 
-app.post("/user/signup", (req, res) => {
-    res.json({message: "You're signed up!"})
-})
-
-app.post("/user/signin", (req, res) => {
-    res.json({message: "You're signed in!"})
-})
+app.use("api/v1/user", userRouter)
+app.use("api/v1/course", courseRouter)
 
 
-app.get("/user/purchases", (req, res) => {
-    res.json({message: "All the purchased courses of user"})
-})
+app.listen(3000);
 
-app.post("/course/purchase", (req, res) => {
-    res.json({message: "User purchased a course"})
-})
 
-app.get("/courses", (req, res) => {
-    res.json("Preview of all courses")
-})
+
