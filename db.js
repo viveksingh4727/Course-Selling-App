@@ -6,13 +6,13 @@ const {Schema, ObjectId} = mongoose;
 const userSchema = new Schema({
     name: String,
     contactNo: Number,
-    email: {type: String, require:true, unique:true},
+    email: {type: String, required:true, unique:true},
     password: String,
 })
 
 const adminSchema = new Schema({
     name: String,
-    email: {type: String, require:true},
+    email: {type: String, required:true, unique: true},
     password: String,
 })
 

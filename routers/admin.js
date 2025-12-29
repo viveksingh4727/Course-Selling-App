@@ -56,7 +56,7 @@ adminRouter.post("/signin", async (req, res) => {
     const admin = await AdminModel.findOne({email});
 
     if(!admin) {
-        res.json({
+        return res.json({
             message: "Admin doesn't exist in db"
         })
     }
@@ -98,6 +98,20 @@ adminRouter.post("/course", adminMiddlware, async (req, res) => {
     })
 })
 
+//fetching all the courses
+
+adminRouter.get("/course", adminMiddlware, async (req, res) => {
+    const adminId = req.userId;
+
+    const courses = await CourseModel.find({
+        creatorId: adminId
+    })
+
+    res.json({
+        courses
+    })
+})
+
 adminRouter.put("/course/:courseId", adminMiddlware, async (req, res) => {
     const adminId = req.userId;
     const { courseId } = req.params;
@@ -107,7 +121,7 @@ adminRouter.put("/course/:courseId", adminMiddlware, async (req, res) => {
     const course = await CourseModel.findById(courseId);
 
     if(!course) {
-        res.status(404).json({
+        return res.status(404).json({
             message: "Course not found"
         })
     }

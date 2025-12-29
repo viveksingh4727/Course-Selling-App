@@ -2,7 +2,7 @@ const {Router} = require("express");
 const {z} = require("zod");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
-const { UserModel } = require("../db");
+const { UserModel, CourseModel, PurchaseModel } = require("../db");
 const { userMiddleware } = require("../middlewares/user");
 
 const userRouter = Router();
@@ -69,9 +69,61 @@ userRouter.post("/signin", async (req, res) => {
         message: "You're signed in!"})
 })
 
+//fetching the user's courses
+userRouter.get("/purchases", userMiddleware, async (req, res) => {
 
-userRouter.get("/purchases", userMiddleware, (req, res) => {
-    res.json({message: "All the purchased courses of user"})
+    const userId = req.userId;
+
+    const purchases = await PurchaseModel.find({
+        userId
+    })
+
+    const courseIds = purchases.map(p => p.courseId);
+
+    const courses = await CourseModel.find({
+        _id: {$in: courseIds}
+    });
+
+
+
+
+    res.json({courses, message: "All the purchased courses of user"})
+})
+
+//user purchasing a course
+
+userRouter.post("/purchase/:courseId", userMiddleware, async (req, res) => {
+    //check if course is already purchased by user
+    //check if course exists or not
+    //create purchase entry
+
+    const userId= req.userId;
+    const {courseId} = req.params;
+
+    const exisitngCourse = await CourseModel.findById(courseId);
+
+    if(exisitngCourse) {
+        return res.status(403).json({message: "No course found"})
+    }
+
+    const alreadyPurchasedCourse = await PurchaseModel.findOne({
+        userId,
+        courseId
+    })
+
+    if(alreadyPurchasedCourse) {
+        return res.status(409).json({
+            message:"Course is already purchased"
+        })
+    }
+
+    await PurchaseModel.create({
+        userId,
+        courseId
+    })
+
+    res.json({message:"Course purchased succesfully"
+    })
 })
 
 
